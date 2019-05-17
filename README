@@ -9,7 +9,7 @@ char* ez_hash_get(ez_hash_table* h, char* key);
 int ez_hash_del(ez_hash_table* h, char* key);
 
 // free the hash table
-uint32_t ez_hash_free(ez_hash_table* h);
+void ez_hash_free(ez_hash_table* h);
 
 
 The ez_hash library uses the FNV algorithm and source code.
@@ -17,20 +17,13 @@ Both the FNV algorithm and source code are in the public domain.
 See the file fnv.h included with this software.
 
 
-Build and install instructions:
-
-$ tar zxvf ez_hash.tar.gz
-$ cd ez_hash
 $ make
 $ sudo make install
 
-Find some usage examples in main.c. Build it like so:
+Find examples in example.c. Build it like so:
 
-$ make main
+$ make example
 
-$ ./main
-usage: ./main key value
-
-$ ./main fred flintstone
-
+$ ./example
+usage: ./example bits(1-32) key value [key value]...
 

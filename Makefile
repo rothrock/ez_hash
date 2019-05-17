@@ -1,23 +1,17 @@
-CFLAGS = -D_FILE_OFFSET_BITS=64 -O
+libez_hash.a: *.c *.h
+	clang -g -c -Wall hash_32.c ez_hash.c
+	ar rcs libez_hash.a ez_hash.o hash_32.o
 
-default: libez_hash.so
-
-libez_hash.so:
-	gcc $(CFLAGS) -fPIC -g -c -Wall hash_32.c ez_hash.c
-	gcc -shared -o libez_hash.so hash_32.o ez_hash.o -lc
-
-ez_hash_example:
-	gcc -o ez_hash_example ez_hash_example.c -L. -lez_hash
-
+example: libez_hash.a
+	clang -g -o example example.c -I. -L. -lez_hash
 
 .PHONY: install
-install:
-	install libez_hash.so /usr/lib/libez_hash.so
-	install ez_hash.h /usr/include/ez_hash.h
-	install fnv.h /usr/include/fnv.h
-	install longlong.h /usr/include/longlong.h
-
+install: libez_hash.a
+	install libez_hash.a /usr/local/lib/libez_hash.a
+	install ez_hash.h /usr/local/include/ez_hash.h
+	install fnv.h /usr/local/include/fnv.h
+	install longlong.h /usr/local/include/longlong.h
 
 .PHONY: clean
 clean:
-	rm -rf ez_hash_example *.o *.so
+	rm -rf example *.o *.so *.a

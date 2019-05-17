@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2010 Joseph (Beau) Rothrock
+Copyright (c) 2019 Joseph Rothrock
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,26 +26,25 @@ THE SOFTWARE.
 #include "fnv.h"
 
 typedef struct ez_hash_rec_struct {
-// This datatype holds a key, corresponding value, and a pointer to the
-// next key-val pair sloshing together in the same bucket.
   char* key;                          // string that we hash on.
   char* value;                        // payload of the record.
-  struct ez_hash_rec_struct* next;    // points to next record in the same bucket.
+  struct ez_hash_rec_struct* next;		// points to next record in the same bucket.
 } ez_hash_rec;
 
 
-typedef struct ez_hash_table_struct {
 // the hash data structure. 
-  int hash_bits;              // a number from 0 to 31. 2**hash_bits = number of hash buckets.
-  int n_members;              // number of records in the hash.
-  ez_hash_rec** buckets;      // Dynamically sized at initialization, Each element of the array corresponds to a hash bucket. The
-                              // subscript of the array is the hash code. Each bucket contains a list of records (ez_hash_rec).
+typedef struct ez_hash_table_struct {
+  int hash_bits;              // A number from 0 to 31. 2**hash_bits = number of hash buckets.
+  int n_members;              // Number of records stored in the hash.
+  ez_hash_rec** buckets;      // Each element is a hash bucket. The array subscript is the hash code.
+															// A bucket is a linked list of ez_hash_rec.
+	uint32_t	max_bucket;				// The array subscript of the last bucket.
 } ez_hash_table;
 
 
 ez_hash_table* ez_hash_init(uint32_t n);
 
-uint32_t ez_hash_free(ez_hash_table* h);
+void ez_hash_free(ez_hash_table* h);
 
 uint32_t ez_hash_set(ez_hash_table* h, char* key, char* value);
 
