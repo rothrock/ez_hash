@@ -25,6 +25,9 @@ THE SOFTWARE.
 #include <stdint.h>
 #include "fnv.h"
 
+#define THREAD_COUNT 16
+
+// A record in the hash table.
 typedef struct ez_hash_rec_struct {
   char* key;                          // string that we hash on.
   char* value;                        // payload of the record.
@@ -32,43 +35,29 @@ typedef struct ez_hash_rec_struct {
 } ez_hash_rec;
 
 
-// the hash data structure. 
+// The hash data structure. 
 typedef struct ez_hash_table_struct {
-  int hash_bits;              // A number from 0 to 31. 2**hash_bits = number of hash buckets.
+  int hash_bits;              // A number from 2 to 31. 2**hash_bits = number of hash buckets.
   int n_members;              // Number of records stored in the hash.
   ez_hash_rec** buckets;      // Each element is a hash bucket. The array subscript is the hash code.
 															// A bucket is a linked list of ez_hash_rec.
-	uint32_t	max_bucket;				// The array subscript of the last bucket.
+	Fnv32_t	max_bucket;					// The array subscript of the last bucket.
 } ez_hash_table;
 
 
-ez_hash_table* ez_hash_init(uint32_t n);
+ez_hash_table* ez_hash_init(Fnv32_t n);
+
+void *_inner_loop_free(void* args);
 
 void ez_hash_free(ez_hash_table* h);
 
-uint32_t ez_hash_set(ez_hash_table* h, char* key, char* value);
+Fnv32_t ez_hash_set(ez_hash_table* h, char* key, char* value);
 
 char* ez_hash_get(ez_hash_table* h, char* key);
 
 int ez_hash_del(ez_hash_table* h, char* key);
 
-// uint32_t _get_hash_val(uint32_t bits, char* key)
-//
-// This is a private wrapper function around the FNV hash function.
-//
-// arguments:
-// 
-// bits - An integer between 0 and 31 used to create bitmask. The function uses
-// the bitmask to trim the size of the hashcode. At the time of this writing,
-// the bits shifting behaves as bits modulo 32. Ex. bits=40 actually shifts 8.
-//
-// key - string that we put into the FNV function.
-//
-// returns:
-//
-// The shifted hashcode.
-uint32_t _get_hash_val(uint32_t bits, char* key);
+Fnv32_t _get_hash_val(Fnv32_t bits, char* key);
 
-
-ez_hash_rec* init_new_rec(char* key, char* value);
+ez_hash_rec* _init_new_rec(char* key, char* value);
  

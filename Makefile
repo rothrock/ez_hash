@@ -1,5 +1,5 @@
 libez_hash.a: *.c *.h
-	clang -g -c -Wall hash_32.c ez_hash.c
+	clang -g -c -Wall hash_32.c ez_hash.c -pthread
 	ar rcs libez_hash.a ez_hash.o hash_32.o
 
 example: libez_hash.a
