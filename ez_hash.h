@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include <stdint.h>
 #include "fnv.h"
 
-#define THREAD_COUNT 16
+#define THREAD_COUNT 4
 
 // A record in the hash table.
 typedef struct ez_hash_rec_struct {
@@ -37,7 +37,7 @@ typedef struct ez_hash_rec_struct {
 
 // The hash data structure. 
 typedef struct ez_hash_table_struct {
-  int hash_bits;              // A number from 2 to 31. 2**hash_bits = number of hash buckets.
+  int hash_bits;              // A number between 2 and 32. 2^hash_bits - 1 = number of buckets.
   int n_members;              // Number of records stored in the hash.
   ez_hash_rec** buckets;      // Each element is a hash bucket. The array subscript is the hash code.
 															// A bucket is a linked list of ez_hash_rec.

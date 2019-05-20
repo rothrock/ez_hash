@@ -114,16 +114,16 @@ void ez_hash_free(ez_hash_table* h) {
 
   Fnv32_t start, end;
 	pthread_t tid[THREAD_COUNT];
-	ez_hash_rec** argv[2] = {NULL, NULL};
+	ez_hash_rec** argv[THREAD_COUNT][2];
 	Fnv32_t step = h->max_bucket / THREAD_COUNT;
 	Fnv32_t remainder = h->max_bucket % THREAD_COUNT;
 
-	// If we have more threads than buckets then
-	// don't bother with threading.
-	if (step == 0) {
-		argv[0] = &h->buckets[0];
-		argv[1] = &h->buckets[h->max_bucket];
-		_inner_loop_free(&argv);
+	// Don't bother with threading if we don't have
+	// a huge number of buckets.
+	if (h->hash_bits < 25) {
+		argv[0][0] = &h->buckets[0];
+		argv[0][1] = &h->buckets[h->max_bucket];
+		_inner_loop_free(&argv[0]);
 		free(h->buckets);
 		return;
 	}
@@ -133,9 +133,9 @@ void ez_hash_free(ez_hash_table* h) {
 		start = i * step;
 		end = start + step - 1;
 		printf("start %u end %u\n", start, end);
-		argv[0] = &h->buckets[start];
-		argv[1] = &h->buckets[end];
-		pthread_create(&tid[i], NULL, _inner_loop_free, &argv);
+		argv[i][0] = &h->buckets[start];
+		argv[i][1] = &h->buckets[end];
+		pthread_create(&tid[i], NULL, _inner_loop_free, &argv[i]);
 	}
 
 	// Wait for all threads to finish.
@@ -143,9 +143,9 @@ void ez_hash_free(ez_hash_table* h) {
 
 	// Free the last bits, if any.
 	if (remainder) {
-		argv[0] = &h->buckets[end + 1];
-		argv[1] = &h->buckets[end + remainder];
-		_inner_loop_free(&argv);
+		argv[0][0] = &h->buckets[end + 1];
+		argv[0][1] = &h->buckets[end + remainder];
+		_inner_loop_free(&argv[0]);
 	}
 
   free(h->buckets);
